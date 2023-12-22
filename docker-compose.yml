@@ -1,0 +1,71 @@
+version: '3'
+
+services:
+  client:
+    build: 
+      context: "./frontend"
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    expose:
+      - 3000
+    container_name: client_container
+    networks:
+      - connect-network
+    volumes:
+      - ./frontend:/app
+    depends_on:
+      - server
+  
+  server:
+    build:
+      context: "./backend"
+      dockerfile: Dockerfile
+    ports:
+      - 5000:5000
+    expose:
+      - 5000
+    container_name: server_container
+    environment:
+      DB_HOST: sql
+      DB_PORT: 3306
+      DB_USER: root
+      DB_PASSWORD: satyamPAL123
+      DB_NAME: user
+      DB_CONNECTION_LIMIT: 20
+      SERVICE_TAGS: prod
+      SERVICE_NAME: serverservice
+    networks:
+      - connect-network
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - sql
+
+  sql:
+    image: mysql:8.0
+    ports:
+      - 3306:3306
+    expose:
+      - 3306
+    command: --default-authentication-plugin=mysql_native_password
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: satyamPAL123
+      MYSQL_DATABASE: user
+      MYSQL_PASSWORD: 'satyamPAL123'
+      SERVICE_TAGS: prod
+      SERVICE_NAME: sql
+    container_name: sql-container
+    networks:
+      - connect-network
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+networks:
+    connect-network:
+      driver: bridge
+volumes:
+  mysql-data:
+
+
