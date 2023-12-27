@@ -2,6 +2,14 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import "./App.css"
 
+const serverHost = process.env.REACT_APP_SERVER_HOST || 'localhost';
+const serverPort = process.env.REACT_APP_SERVER_PORT || 5000;
+const serverUrl = `http://${serverHost}:${serverPort}`;
+
+console.log(serverUrl);
+
+axios.defaults.baseURL = 'http://localhost:5000';
+
 function App() {
   const [users, setUsers] = useState([]);
   const [name, setName] = useState('');
@@ -13,7 +21,7 @@ function App() {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/users');
+      const response = await axios.get('/users');
       console.log(response.data);
       setUsers(response.data);
     } catch (error) {
@@ -23,7 +31,7 @@ function App() {
 
   const createUser = async () => {
     try {
-      await axios.post('http://localhost:5000/users', { name, email });
+      await axios.post('/users', { name, email });
       fetchUsers();
       setName('');
       setEmail('');
@@ -34,7 +42,7 @@ function App() {
 
   const deleteUser = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/users/${id}`);
+      await axios.delete(`/users/${id}`);
       fetchUsers();
     } catch (error) {
       console.error('Error deleting user:', error);
